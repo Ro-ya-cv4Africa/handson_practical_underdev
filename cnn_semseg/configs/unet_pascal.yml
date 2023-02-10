@@ -4,15 +4,15 @@ data:
     dataset: pascal
     train_split: train_aug
     val_split: val
-    img_rows: 'same'
-    img_cols: 'same'
-    path: /content/VOCdevkit/VOC2012E
-    sbd_path: /content/benchmark_RELEASE
+    img_rows: 300
+    img_cols: 300
+    path: /local/riemann1/home/msiam/PASCAL/VOCdevkit/VOC2012/
+    sbd_path: /local/riemann1/home/msiam/PASCAL/benchmark_RELEASE/
 training:
     train_iters: 300000
     batch_size: 1
     val_interval: 1000
-    n_workers: 16
+    n_workers: 0
     print_interval: 50
     optimizer:
         name: 'sgd'

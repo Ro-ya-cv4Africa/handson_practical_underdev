@@ -19,6 +19,8 @@ from ptsemseg.augmentations import get_composed_augmentations
 from ptsemseg.schedulers import get_scheduler
 from ptsemseg.optimizers import get_optimizer
 
+import torch.nn.functional as F
+
 from tensorboardX import SummaryWriter
 
 
@@ -128,6 +130,9 @@ def train(cfg, writer, logger):
             optimizer.zero_grad()
             outputs = model(images)
 
+            if outputs.shape[0] != labels.shape[0] or outputs.shape[1] != labels.shape[1]:
+                outputs = F.interpolate(outputs, labels.shape[-2:])
+
             loss = loss_fn(input=outputs, target=labels)
 
             loss.backward()
@@ -159,6 +164,9 @@ def train(cfg, writer, logger):
                         labels_val = labels_val.to(device)
 
                         outputs = model(images_val)
+                        if outputs.shape[0] != labels_val.shape[0] or outputs.shape[1] != labels_val.shape[1]:
+                            outputs = F.interpolate(outputs, labels_val.shape[-2:])
+
                         val_loss = loss_fn(input=outputs, target=labels_val)
 
                         pred = outputs.data.max(1)[1].cpu().numpy()

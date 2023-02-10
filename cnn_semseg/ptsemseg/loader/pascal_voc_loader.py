@@ -8,6 +8,7 @@ import scipy.misc as m
 import scipy.io as io
 import matplotlib.pyplot as plt
 import glob
+import cv2
 
 from PIL import Image
 from tqdm import tqdm
@@ -98,8 +99,15 @@ class pascalVOCLoader(data.Dataset):
         if self.img_size == ("same", "same"):
             pass
         else:
-            img = img.resize((self.img_size[0], self.img_size[1]))  # uint8 with RGB mode
-            lbl = lbl.resize((self.img_size[0], self.img_size[1]))
+            if img.size[0] < img.size[1]:
+                new_h = int(self.img_size[0]/img.size[1] * img.size[1])
+                img = img.resize((self.img_size[0], new_h))  # uint8 with RGB mode
+                lbl = lbl.resize((self.img_size[0], new_h), Image.NEAREST)
+            else:
+                new_w = int(self.img_size[1]/img.size[1] * img.size[0])
+                img = img.resize((new_w, self.img_size[1]))  # uint8 with RGB mode
+                lbl = lbl.resize((new_w, self.img_size[1]), Image.NEAREST)
+
         img = self.tf(img)
         lbl = torch.from_numpy(np.array(lbl)).long()
         lbl[lbl == 255] = 0
